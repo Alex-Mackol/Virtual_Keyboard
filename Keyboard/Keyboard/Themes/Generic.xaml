@@ -9,6 +9,8 @@
                     <Border Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}">
+                        
+                        <Grid x:Name="MAIN_Grid"></Grid>
                     </Border>
                 </ControlTemplate>
             </Setter.Value>

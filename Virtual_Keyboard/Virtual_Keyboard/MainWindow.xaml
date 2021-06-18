@@ -5,8 +5,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Virtual_Keyboard"
         mc:Ignorable="d"
+        
+        xmlns:MyNamespace="clr-namespace:Keyboard;assembly=Keyboard"
+        
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <Grid Margin="631,0,0,396">
+        <TextBox Margin="-548,48,548,-48"/>
+        <TextBox Margin="-548,120,548,-120"/>
 
+        <MyNamespace:ButtonsKey Margin="-298,132,228,-330"/>
     </Grid>
 </Window>
