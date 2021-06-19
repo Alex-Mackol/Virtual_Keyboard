@@ -49,14 +49,14 @@ namespace Keyboard
     ///
     /// </summary>
     [TemplatePart(Name = "MAIN_Grid", Type = typeof(Grid))]
-    public class ButtonsKey : Control
+    public class NumPadControl : Control
     {
-        static ButtonsKey()
+        static NumPadControl()
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(ButtonsKey), new FrameworkPropertyMetadata(typeof(ButtonsKey)));
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(NumPadControl), new FrameworkPropertyMetadata(typeof(NumPadControl)));
         }
 
-        public ButtonsKey()
+        public NumPadControl()
         {
             BuildNumpad();
         }
@@ -102,6 +102,7 @@ namespace Keyboard
                     virtualNumber++;
                 }
             }
+
             RepeatButton repeatButton1 = new RepeatButton()
             {
                 Content = Convert.ToChar(0x30),
@@ -121,12 +122,11 @@ namespace Keyboard
                 Margin = new Thickness(3),
                 Focusable = false
             };
+
             repeatButton2.Click += RepeatButton_Click;
             Grid.SetRow(repeatButton2, NAMPAD_ROW - 1);
             Grid.SetColumn(repeatButton2, NAMPAD_cOLUMN-1);
             _numpadGrid.Children.Add(repeatButton2);
-
-
         }
 
         private void RepeatButton_Click(object sender, RoutedEventArgs e)

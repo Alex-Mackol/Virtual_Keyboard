@@ -13,6 +13,6 @@
         <TextBox Margin="-548,48,548,-48"/>
         <TextBox Margin="-548,120,548,-120"/>
 
-        <MyNamespace:ButtonsKey Margin="-298,132,228,-330"/>
+        <MyNamespace:NumPadControl Margin="-192,104,80,-344" RenderTransformOrigin="0.142,0.434"/>
     </Grid>
 </Window>
