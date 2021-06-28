@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Keyboard.Enums
 {
-    enum VirtualKeyShort : ushort
+    public enum VirtualKeyShort : ushort
     {
         ///<summary>
         ///Left mouse button

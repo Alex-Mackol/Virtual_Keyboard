@@ -4,15 +4,22 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Virtual_Keyboard"
+        
         mc:Ignorable="d"
         
         xmlns:MyNamespace="clr-namespace:Keyboard;assembly=Keyboard"
         
-        Title="MainWindow" Height="450" Width="800">
-    <Grid Margin="631,0,0,396">
-        <TextBox Margin="-548,48,548,-48"/>
-        <TextBox Margin="-548,120,548,-120"/>
-
-        <MyNamespace:NumPadControl Margin="-192,104,80,-344" RenderTransformOrigin="0.142,0.434"/>
+        Title="MainWindow" Height="514" Width="907">
+    <Grid Margin="10,10,10,10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <TextBox Grid.Row="0" Margin="0,0,223,50"/>
+        <TextBox Grid.Row="1" Margin="0,0,223,50"/>
+        <MyNamespace:KeyBoardPanel Grid.Row="2"/>
+        
     </Grid>
 </Window>
