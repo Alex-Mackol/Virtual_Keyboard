@@ -103,7 +103,7 @@ namespace Keyboard.ViewModels
             Win32Func.ToUnicodeEx(VKCode, lScanCode, bKeyState, sbString, (int)5, (uint)0, HKL);
             return sbString.ToString();
         }
-
+         
 
         public string VKCodeToUnicodeFromCode(uint VKCode, IntPtr HKL)
         {
@@ -114,6 +114,31 @@ namespace Keyboard.ViewModels
             if (!bKeyStateStatus)
                 return "";
             uint lScanCode = Win32Func.MapVirtualKey(VKCode, 0);
+
+            Win32Func.ToUnicodeEx(VKCode, lScanCode, bKeyState, sbString, (int)5, (uint)0, HKL);
+            return sbString.ToString();
+        }
+
+        public string VKCodeToUnicodeShift(uint VKCode, bool flag)
+        {
+            StringBuilder sbString = new StringBuilder();
+
+            byte[] bKeyState = new byte[256];
+            bool bKeyStateStatus = Win32Func.GetKeyboardState(bKeyState);
+            if (!bKeyStateStatus)
+                return "";
+            if (flag)
+            {
+                bKeyState[16] = 128;
+                bKeyState[160] = 128;
+            }
+            else
+            {
+                bKeyState[16] = 0;
+                bKeyState[160] = 0;
+            }
+            uint lScanCode = Win32Func.MapVirtualKey(VKCode, 0);
+            IntPtr HKL = Win32Func.GetKeyboardLayout(0);
 
             Win32Func.ToUnicodeEx(VKCode, lScanCode, bKeyState, sbString, (int)5, (uint)0, HKL);
             return sbString.ToString();

@@ -9,17 +9,19 @@
         
         xmlns:MyNamespace="clr-namespace:Keyboard;assembly=Keyboard"
         
-        Title="MainWindow" Height="514" Width="907">
-    <Grid Margin="10,10,10,10">
+        Title="MainWindow" Height="590" Width="1068">
+    <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="100"/>
             <RowDefinition Height="100"/>
             <RowDefinition Height="100"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
-        <TextBox Grid.Row="0" Margin="0,0,223,50"/>
-        <TextBox Grid.Row="1" Margin="0,0,223,50"/>
-        <MyNamespace:KeyBoardPanel Grid.Row="2"/>
-        
+
+
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="All" Grid.Row="0" Margin="229,40,223,10"/>
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="MainBoard" Grid.Row="1" Margin="234,25,223,25"/>
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="Numpad" Grid.Row="2" Margin="234,24,223,26"/>
+        <MyNamespace:KeyBoardPanel Grid.Row="3" Margin="10,0,0,0"/>
     </Grid>
 </Window>
