@@ -9,17 +9,40 @@
         
         xmlns:MyNamespace="clr-namespace:Keyboard;assembly=Keyboard"
         
-        Title="MainWindow" Height="514" Width="907">
-    <Grid Margin="10,10,10,10">
+        Title="MainWindow" Height="614" Width="1068">
+    <Grid x:Name="gridMain" Focusable="True" Background="AliceBlue">
         <Grid.RowDefinitions>
+            <RowDefinition Height="120"/>
             <RowDefinition Height="100"/>
             <RowDefinition Height="100"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
-        
-        <TextBox Grid.Row="0" Margin="0,0,223,50"/>
-        <TextBox Grid.Row="1" Margin="0,0,223,50"/>
-        <MyNamespace:KeyBoardPanel Grid.Row="2"/>
-        
+
+        <TextBlock Text="Personal card"
+                   Grid.Row="0"
+                   FontSize="30"
+                   HorizontalAlignment="Center"/>
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="MainBoard" 
+                 FontSize="17" Grid.Row="0" Margin="445,55,223,10"/>
+        <TextBlock Text="Person`s name"
+                   Grid.Row="0"
+                   FontSize="25"
+                   HorizontalAlignment="Left" Margin="236,55,0,95" Width="178" Grid.RowSpan="2"/>
+
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="All" 
+                 FontSize="17" Grid.Row="1" Margin="445,25,223,25"/>
+        <TextBlock Text="Person`s adress"
+                   Grid.Row="1"
+                   FontSize="25"
+                   HorizontalAlignment="Left" Margin="236,25,0,25" Width="178"/>
+
+        <TextBox MyNamespace:KeyBoardPanel.KeyboardLoyautChanged="Numpad" 
+                 FontSize="17" Grid.Row="2" Margin="445,24,223,26"/>
+        <TextBlock Text="Person`s number"
+                   Grid.Row="2"
+                   FontSize="25"
+                   HorizontalAlignment="Left" Margin="236,25,0,25" Width="197"/>
+
+        <MyNamespace:KeyBoardPanel x:Name="keyboard" Grid.Row="3" Margin="10,0,0,0"/>
     </Grid>
 </Window>
