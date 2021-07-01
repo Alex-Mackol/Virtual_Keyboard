@@ -138,6 +138,10 @@ namespace Keyboard
         private void Current_Exit(object sender, ExitEventArgs e)
         {
             ((ToggleButton)KeysListButtons[FIRSTROW + SECONDROW]).IsChecked = false;
+            byte[] bKeyState = new byte[256];
+            bool bKeyStateStatus = Win32Func.GetKeyboardState(bKeyState);
+            bKeyState[16] = 0;
+            bKeyState[160] = 0;
         }
 
         ItemsControl PanelForKeyboard;
