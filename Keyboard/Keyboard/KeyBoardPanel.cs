@@ -35,7 +35,7 @@ namespace Keyboard
             KeyDataProperty = DependencyProperty.RegisterAttached("KeyData", typeof(KeyModel), typeof(KeyBoardPanel));
             KeyboardLoyautChangedProperty = DependencyProperty.RegisterAttached("KeyboardLoyautChanged", typeof(KeyboardState), typeof(KeyBoardPanel));
 
-            KeyLoyautsProperty = DependencyProperty.Register("KeyLoyauts", typeof(KeyboardState), typeof(KeyBoardPanel), new PropertyMetadata(KeyboardState.None));
+            KeyLoyautsProperty = DependencyProperty.Register("KeyLoyauts", typeof(KeyboardState), typeof(KeyBoardPanel), new PropertyMetadata(KeyboardState.All));
             AnimationProperty = DependencyProperty.Register("Animated", typeof(bool), typeof(KeyBoardPanel), new PropertyMetadata(true));
 
         }
@@ -73,7 +73,7 @@ namespace Keyboard
                 {
                     PanelNumpad.Items.Clear();
                 }
-                KeyLoyauts = GetKeyboardLoyautChanged(sender as DependencyObject);
+                KeyLoyauts = KeyBoardPanel.GetKeyboardLoyautChanged(sender as DependencyObject);
                 InvalidateVisual();
             }
             e.Handled = true;
@@ -138,10 +138,21 @@ namespace Keyboard
         private void Current_Exit(object sender, ExitEventArgs e)
         {
             ((ToggleButton)KeysListButtons[FIRSTROW + SECONDROW]).IsChecked = false;
-            byte[] bKeyState = new byte[256];
-            bool bKeyStateStatus = Win32Func.GetKeyboardState(bKeyState);
-            bKeyState[16] = 0;
-            bKeyState[160] = 0;
+            KeyModel keyModel;
+            for (int i = 0; i < KeysListButtons.Count - 1; i++)
+            {
+                keyModel = KeyBoardPanel.GetKeyData(KeysListButtons[i] as DependencyObject);
+
+                if (keyModel.DisplayName != null && keyModel.IsDefault == false)
+                {
+                    keyModel.DisplayName = keyModel.VKCodeToUnicodeShift((uint)keyModel.VirtualKey, Convert.ToBoolean(((ToggleButton)KeysListButtons[FIRSTROW + SECONDROW]).IsChecked));
+                    keyModel.DisplayName = keyModel.DisplayName.ToUpper();
+
+                    ((ButtonBase)KeysListButtons[i]).Content = keyModel.DisplayName;
+                }
+
+                KeyBoardPanel.SetKeyData(KeysListButtons[i], keyModel);
+            }
         }
 
         ItemsControl PanelForKeyboard;
