@@ -35,9 +35,10 @@ namespace Keyboard
             KeyDataProperty = DependencyProperty.RegisterAttached("KeyData", typeof(KeyModel), typeof(KeyBoardPanel));
             KeyboardLoyautChangedProperty = DependencyProperty.RegisterAttached("KeyboardLoyautChanged", typeof(KeyboardState), typeof(KeyBoardPanel));
 
-            KeyLoyautsProperty = DependencyProperty.Register("KeyLoyauts", typeof(KeyboardState), typeof(KeyBoardPanel), new PropertyMetadata(KeyboardState.All));
+            KeyLoyautsProperty = DependencyProperty.Register("KeyLoyauts", typeof(KeyboardState), typeof(KeyBoardPanel), new PropertyMetadata(KeyboardState.None));
             AnimationProperty = DependencyProperty.Register("Animated", typeof(bool), typeof(KeyBoardPanel), new PropertyMetadata(true));
 
+            FocusableProperty.OverrideMetadata(typeof(ComboBoxItem), new FrameworkPropertyMetadata(false));
         }
 
 
@@ -61,10 +62,14 @@ namespace Keyboard
             return (KeyboardState)element.GetValue(KeyboardLoyautChangedProperty);
         }
 
-        internal void GotFocusEvent(object sender, RoutedEventArgs e)
+        public void GotFocusEventTextbox(object sender, RoutedEventArgs e)
         {
-            if (sender is TextBox)
+            if (sender is TextBox && GetKeyboardLoyautChanged(sender as DependencyObject) != KeyLoyauts)
             {
+                if(KeyLoyauts == KeyboardState.None)
+                {
+                    KeyLoyauts = keyboardState;
+                }
                 if (PanelForKeyboard != null)
                 {
                     PanelForKeyboard.Items.Clear();
@@ -73,11 +78,11 @@ namespace Keyboard
                 {
                     PanelNumpad.Items.Clear();
                 }
-                KeyLoyauts = KeyBoardPanel.GetKeyboardLoyautChanged(sender as DependencyObject);
-                InvalidateVisual();
+                KeyLoyauts = GetKeyboardLoyautChanged(sender as DependencyObject);
             }
             e.Handled = true;
         }
+
 
 
         private const int FIRSTROW = 13;
@@ -131,28 +136,29 @@ namespace Keyboard
             MakeKeyListData();
             MakeListButtons();
             MakeNumpad();
-            EventManager.RegisterClassHandler(typeof(UIElement), GotKeyboardFocusEvent, new RoutedEventHandler(GotFocusEvent));
-            Application.Current.Exit += Current_Exit;
+            EventManager.RegisterClassHandler(typeof(UIElement), GotKeyboardFocusEvent, new RoutedEventHandler(GotFocusEventTextbox));
+            EventManager.RegisterClassHandler(typeof(UIElement), MouseLeftButtonUpEvent, new RoutedEventHandler(LostFocusUiElement));
+            Application.Current.Exit += Current_Exit; ;
+        }
+        private KeyboardState keyboardState;
+        public void LostFocusUiElement(object sender, RoutedEventArgs e)
+        {
+            if (sender is Window)
+            {
+                System.Windows.Input.Keyboard.Focus(sender as IInputElement);
+                keyboardState = KeyLoyauts;
+                KeyLoyauts = KeyboardState.None;
+            }
         }
 
         private void Current_Exit(object sender, ExitEventArgs e)
         {
-            ((ToggleButton)KeysListButtons[FIRSTROW + SECONDROW]).IsChecked = false;
-            KeyModel keyModel;
-            for (int i = 0; i < KeysListButtons.Count - 1; i++)
-            {
-                keyModel = KeyBoardPanel.GetKeyData(KeysListButtons[i] as DependencyObject);
+            INPUT[] Inputs = new INPUT[1];
+            Inputs[0].type = 1;
+            Inputs[0].U.ki.wVk = VirtualKeyShort.LSHIFT;
+            Inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
 
-                if (keyModel.DisplayName != null && keyModel.IsDefault == false)
-                {
-                    keyModel.DisplayName = keyModel.VKCodeToUnicodeShift((uint)keyModel.VirtualKey, Convert.ToBoolean(((ToggleButton)KeysListButtons[FIRSTROW + SECONDROW]).IsChecked));
-                    keyModel.DisplayName = keyModel.DisplayName.ToUpper();
-
-                    ((ButtonBase)KeysListButtons[i]).Content = keyModel.DisplayName;
-                }
-
-                KeyBoardPanel.SetKeyData(KeysListButtons[i], keyModel);
-            }
+            Win32Func.SendInput(1, Inputs, INPUT.Size);
         }
 
         ItemsControl PanelForKeyboard;
@@ -232,7 +238,8 @@ namespace Keyboard
                         FontSize = 16,
                         Focusable = false
                     });
-                    ((ToggleButton)KeysListButtons[i]).Click += Shift_Click;
+                    ((ToggleButton)KeysListButtons[i]).Checked += Shift_Click;
+                    ((ToggleButton)KeysListButtons[i]).Unchecked += Shift_Unchecked;
                 }
                 else
                 {
@@ -251,7 +258,7 @@ namespace Keyboard
             {
                 Focusable = false
             });
-            KeyBoardPanel.SetKeyData(KeysListButtons[42], KeysListData[42]);
+            KeyBoardPanel.SetKeyData(KeysListButtons[KeysListData.Count-1], KeysListData[KeysListData.Count-1]);
             ((ComboBox)KeysListButtons.Last()).ItemsSource = SetLanguagesForComboBox();
 
             var hKL = Win32Func.GetKeyboardLayout(0);
@@ -269,7 +276,7 @@ namespace Keyboard
 
         }
 
-
+      
         private void MakeNumpad()
         {
             NumpadListData = new List<KeyModel>();
@@ -299,12 +306,10 @@ namespace Keyboard
                     FontSize = 16,
                     Focusable = false
                 });
-                ((RepeatButton)NumpadListButtons[i]).Click += NumPad_Click1;
+                ((RepeatButton)NumpadListButtons[i]).Click += KeyBoardPanel_Click;
                 KeyBoardPanel.SetKeyData(NumpadListButtons[i], NumpadListData[i]);
             }
         }
-
-
 
         private void KeyBoardPanel_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -379,18 +384,6 @@ namespace Keyboard
             Win32Func.SendInput(2, Inputs, INPUT.Size);
         }
 
-        private void NumPad_Click1(object sender, RoutedEventArgs e)
-        {
-            INPUT[] Inputs = new INPUT[2];
-            KeyModel keyModel = KeyBoardPanel.GetKeyData(sender as DependencyObject);
-            Inputs[0].type = 1;
-            Inputs[0].U.ki.wVk = keyModel.VirtualKey;
-            Inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
-            Inputs[1].type = 1;
-            Inputs[1].U.ki.wVk = keyModel.VirtualKey;
-            Inputs[1].U.ki.dwFlags = KEYEVENTF.KEYDOWN;
-            Win32Func.SendInput(2, Inputs, INPUT.Size);
-        }
 
         private void Shift_Click(object sender, RoutedEventArgs e)
         {
@@ -398,8 +391,7 @@ namespace Keyboard
             KeyModel keyModel;
             INPUT[] Inputs = new INPUT[1];
 
-            if (Convert.ToBoolean(toggleButton.IsChecked))
-            {
+           
                 Inputs[0].type = 1;
                 Inputs[0].U.ki.wVk = VirtualKeyShort.LSHIFT;
 
@@ -418,33 +410,35 @@ namespace Keyboard
                     }
 
                     KeyBoardPanel.SetKeyData(KeysListButtons[i], keyModel);
-                }
-            }
-
-            else
-            {
-                Inputs[0].type = 1;
-                Inputs[0].U.ki.wVk = VirtualKeyShort.LSHIFT;
-                Inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
-
-                Win32Func.SendInput(1, Inputs, INPUT.Size);
-
-                for (int i = 0; i < KeysListButtons.Count - 1; i++)
-                {
-                    keyModel = KeyBoardPanel.GetKeyData(KeysListButtons[i] as DependencyObject);
-
-                    if (keyModel.DisplayName != null && keyModel.IsDefault == false)
-                    {
-                        keyModel.DisplayName = keyModel.VKCodeToUnicodeShift((uint)keyModel.VirtualKey, Convert.ToBoolean(toggleButton.IsChecked));
-                        keyModel.DisplayName = keyModel.DisplayName.ToLower();
-
-                        ((ButtonBase)KeysListButtons[i]).Content = keyModel.DisplayName;
-                    }
-
-                    KeyBoardPanel.SetKeyData(KeysListButtons[i], keyModel);
-                }
             }
         }
-        
+        private void Shift_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ToggleButton toggleButton = sender as ToggleButton;
+            KeyModel keyModel;
+            INPUT[] Inputs = new INPUT[1];
+            Inputs[0].type = 1;
+            Inputs[0].U.ki.wVk = VirtualKeyShort.LSHIFT;
+            Inputs[0].U.ki.dwFlags = KEYEVENTF.KEYUP;
+
+            Win32Func.SendInput(1, Inputs, INPUT.Size);
+
+            for (int i = 0; i < KeysListButtons.Count - 1; i++)
+            {
+                keyModel = KeyBoardPanel.GetKeyData(KeysListButtons[i] as DependencyObject);
+
+                if (keyModel.DisplayName != null && keyModel.IsDefault == false)
+                {
+                    keyModel.DisplayName = keyModel.VKCodeToUnicodeShift((uint)keyModel.VirtualKey, Convert.ToBoolean(toggleButton.IsChecked));
+                    keyModel.DisplayName = keyModel.DisplayName.ToLower();
+
+                    ((ButtonBase)KeysListButtons[i]).Content = keyModel.DisplayName;
+                }
+
+                KeyBoardPanel.SetKeyData(KeysListButtons[i], keyModel);
+            }
+        }
+
+
     }
 }

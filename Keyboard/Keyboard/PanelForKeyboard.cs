@@ -48,31 +48,31 @@ namespace Keyboard
             return base.ArrangeOverride(finalSize);
         }
 
-        private double keyWidth;
-        private double keyHeigth;
+        private double keyWidthDefoult;
+        private double keyHeigthDefoult;
         private double width;
         protected override Size MeasureOverride(Size availableSize)
         {
             List<FrameworkElement> line = GetLines(0);
 
-            keyWidth = (availableSize.Width - KeyMargin.Left * (line.Count+1)) / line.Count;
-            keyHeigth = (availableSize.Height - KeyMargin.Bottom * (ROWCOUNT+1)) / ROWCOUNT;
+            keyWidthDefoult = (availableSize.Width - KeyMargin.Left * (line.Count+1)) / line.Count;
+            keyHeigthDefoult = (availableSize.Height - KeyMargin.Bottom * (ROWCOUNT+1)) / ROWCOUNT;
 
             foreach (FrameworkElement child in Children)
             {
-                width = (KeyBoardPanel.GetKeyData(child).WidthKoef * keyWidth) - KeyMargin.Left ;
+                width = (KeyBoardPanel.GetKeyData(child).WidthKoef * keyWidthDefoult) - KeyMargin.Left;
 
                 if(width<0)
                 {
                     width = 0;
                 }
-                if(keyHeigth<0)
+                if(keyHeigthDefoult < 0)
                 {
-                    keyHeigth = 0;
+                    keyHeigthDefoult = 0;
                 }
-                Size size = new Size(width, keyHeigth);
+                Size size = new Size(width, keyHeigthDefoult);
                 child.Width = width;
-                child.Height = keyHeigth;
+                child.Height = keyHeigthDefoult;
                 child.Measure(size);
             }
             return base.MeasureOverride(availableSize);
