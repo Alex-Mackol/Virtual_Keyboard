@@ -1,6 +1,7 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:local="clr-namespace:Keyboard;assembly=">
+                    xmlns:local="clr-namespace:Keyboard;assembly="
+                    >
 
     
     
@@ -70,8 +71,11 @@
 
         </Grid>
     </ControlTemplate>
-    
-<Style TargetType="{x:Type local:KeyBoardPanel}">
+
+    <ControlTemplate x:Key="None" TargetType="{x:Type local:KeyBoardPanel}">
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:KeyBoardPanel}">
         <Style.Triggers>
             <Trigger Property="KeyLoyauts" Value="All">
                 <Setter Property="Template" Value="{StaticResource All}"/>
@@ -83,6 +87,10 @@
 
             <Trigger Property="KeyLoyauts" Value="Numpad">
                 <Setter Property="Template" Value="{StaticResource Numpad}"/>
+            </Trigger>
+
+            <Trigger Property="KeyLoyauts" Value="None">
+                <Setter Property="Template" Value="{StaticResource None}"/>
             </Trigger>
         </Style.Triggers>
     </Style>

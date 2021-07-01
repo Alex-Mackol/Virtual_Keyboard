@@ -10,6 +10,7 @@ namespace Keyboard.Enums
     {
         All,
         MainBoard,
-        Numpad
+        Numpad,
+        None
     }
 }
